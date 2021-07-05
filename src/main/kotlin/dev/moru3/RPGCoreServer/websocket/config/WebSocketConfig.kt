@@ -1,10 +1,10 @@
 package dev.moru3.RPGCoreServer.websocket.config
 
 import dev.moru3.RPGCoreServer.websocket.AuthChecker.Companion.checkAuthRegex
+import dev.moru3.RPGCoreServer.websocket.AuthChecker.Companion.checkToken
 import dev.moru3.RPGCoreServer.websocket.WebSocketController
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
 import org.springframework.http.server.ServerHttpRequest
 import org.springframework.http.server.ServerHttpResponse
 import org.springframework.web.socket.WebSocketHandler
@@ -32,8 +32,14 @@ class WebSocketConfig: WebSocketConfigurer {
                             false
                         }
                         else -> {
-                            authHeader
-                            false
+                            val token = authHeader.replace("Bearer ", "")
+                            if(token.checkToken(request.remoteAddress)) {
+                                true
+                            } else {
+                                val result = "{\n\t\"response\": 401,\n\t\"message\": \"Token is not correct. Please regenerate token..\"\n}"
+                                response.body.writer().apply { write(result);flush() }
+                                false
+                            }
                         }
                     }
                 }
