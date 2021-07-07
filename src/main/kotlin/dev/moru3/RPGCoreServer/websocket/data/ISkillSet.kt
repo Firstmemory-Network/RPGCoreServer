@@ -9,3 +9,21 @@ interface ISkillSet {
 
     fun reload()
 }
+
+enum class SkillType(val id: Byte) {
+    STAMINA(0),
+    DEFENCE(1),
+    STRENGTH(2),
+    INTELLIGENCE(3),
+    VOMITING(4);
+
+    companion object {
+        val types = mutableMapOf<Byte, SkillType>()
+
+        init { values().forEach { types[it.id] = it } }
+
+        fun getById(id: Byte): SkillType {
+            return types[id]?:throw IllegalArgumentException()
+        }
+    }
+}

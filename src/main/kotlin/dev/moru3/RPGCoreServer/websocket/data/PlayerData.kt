@@ -6,14 +6,17 @@ import kotlin.concurrent.thread
 import kotlin.math.pow
 
 class PlayerData(val uuid: UUID): IPlayerData {
-    override var balance: Int = 0
+
+    var isOnline = false
+
+    override var balance: Long = 0
         set(value) {
             if(value==field) { return }
             Update("userdata", Where().addKey("uuid").equals().addValue(uuid)).addValue("money", value).send()
             field = value
         }
 
-    override var experience: Int = 0
+    override var experience: Long = 0
         set(value) {
             if(value==field) { return }
             Update("userdata", Where().addKey("uuid").equals().addValue(uuid)).addValue("exp", value).send()
@@ -73,7 +76,7 @@ class PlayerData(val uuid: UUID): IPlayerData {
     fun checkLevelUp(): Boolean {
         return if((10.0 * level).pow(2) <= experience) {
             level+=1
-            experience = ((experience-(10.0 * (level-1))).pow(2)).toInt()
+            experience = ((experience-(10.0 * (level-1))).pow(2)).toLong()
             checkLevelUp()
             true
         } else {
@@ -83,14 +86,15 @@ class PlayerData(val uuid: UUID): IPlayerData {
 
     private fun reSetup() {
         Insert("userdata")
-            .addValue(DataType.VARCHAR ,"uuid", uuid)
+            .addValue(me.moru3.sqlow.DataType.VARCHAR ,"uuid", uuid)
             .send(false)
-        Insert("status")
-            .addValue(DataType.VARCHAR ,"uuid", uuid)
+        Insert("skills")
+            .addValue(me.moru3.sqlow.DataType.VARCHAR ,"uuid", uuid)
             .send(false)
     }
 
     private fun syncOldLevel() {
+        if(!isOnline) { return }
         if(oldLevel==level) { return }
         thread {
             repeat((1..level-oldLevel).count()) {
@@ -104,20 +108,20 @@ class PlayerData(val uuid: UUID): IPlayerData {
         reSetup()
         val result = Select("userdata", Where().addKey("uuid").equals().addValue(uuid)).send()
         if(!result.next()) throw NullPointerException()
-        balance = result.getInt("money")
-        experience = result.getInt("exp")
+        balance = result.getLong("money")
+        experience = result.getLong("exp")
         level = result.getInt("level")
         maxHealth = result.getInt("max_health")
         maxStamina = result.getInt("max_stamina")
         statusPoint = result.getInt("status_point")
-        oldLevel = result.getInt("old_level")
+        oldLevel = result.getInt("last_level")
     }
 
     init {
         reload()
         health = maxHealth.toDouble()
         stamina = maxStamina
-        syncOldLevel()
+        if(isOnline) { syncOldLevel() }
     }
 
     companion object {

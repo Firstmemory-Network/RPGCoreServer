@@ -28,6 +28,7 @@ dependencies {
 	implementation("com.google.code.gson:gson:2.8.7")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	runtimeOnly("mysql:mysql-connector-java")
 
 	// SQLow
 	api("com.github.moru348:SQLow:003e03ab0d")

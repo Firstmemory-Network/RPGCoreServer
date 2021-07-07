@@ -1,4 +1,4 @@
-package dev.moru3.RPGCoreServer.websocket
+package dev.moru3.RPGCoreServer.managers
 
 import dev.moru3.RPGCoreServer.websocket.data.IPlayerData
 import dev.moru3.RPGCoreServer.websocket.data.PlayerData

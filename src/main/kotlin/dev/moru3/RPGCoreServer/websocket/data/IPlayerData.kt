@@ -4,12 +4,12 @@ interface IPlayerData {
     /**
      * かね
      */
-    var balance: Int
+    var balance: Long
 
     /**
      * EXP
      */
-    var experience: Int
+    var experience: Long
 
     /**
      * レベル

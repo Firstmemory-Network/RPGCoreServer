@@ -1,5 +1,6 @@
 package dev.moru3.RPGCoreServer.websocket.config
 
+import dev.moru3.RPGCoreServer.managers.SessionManager.Companion.blockAddress
 import dev.moru3.RPGCoreServer.websocket.WebSocketController
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -22,8 +23,7 @@ class WebSocketConfig: WebSocketConfigurer {
             object: HttpSessionHandshakeInterceptor() {
                 //@SECURITY
                 override fun beforeHandshake(request: ServerHttpRequest, response: ServerHttpResponse, wsHandler: WebSocketHandler, attributes: MutableMap<String, Any>): Boolean {
-                    println(request.headers)
-                    request.headers.remove(HttpHeaders.ORIGIN)
+                    if(blockAddress.contains(request.remoteAddress.hostName)) { return false }
                     return true
                 }
             }
