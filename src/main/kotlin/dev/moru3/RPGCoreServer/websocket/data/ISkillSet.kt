@@ -17,13 +17,7 @@ enum class SkillType(val id: Byte) {
     INTELLIGENCE(3),
     VOMITING(4);
 
-    companion object {
-        val types = mutableMapOf<Byte, SkillType>()
-
-        init { values().forEach { types[it.id] = it } }
-
-        fun getById(id: Byte): SkillType {
-            return types[id]?:throw IllegalArgumentException()
-        }
+    override fun toString(): String {
+        return super.toString().lowercase()
     }
 }

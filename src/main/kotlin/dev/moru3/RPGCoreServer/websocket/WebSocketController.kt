@@ -13,6 +13,7 @@ import dev.moru3.RPGCoreServer.websocket.data.DataType
 import dev.moru3.RPGCoreServer.websocket.data.DataType.*
 import dev.moru3.RPGCoreServer.websocket.data.RequestType
 import dev.moru3.RPGCoreServer.websocket.data.RequestType.*
+import dev.moru3.RPGCoreServer.websocket.data.SkillType
 import dev.moru3.RPGCoreServer.websocket.model.SetType
 import org.springframework.stereotype.Component
 import org.springframework.web.socket.*
@@ -121,11 +122,22 @@ class WebSocketController: TextWebSocketHandler() {
                 body.add("result", JsonPrimitive(playerData.statusPoint))
                 sessions.forEach { it.sendMessage(TextMessage(gson.toJson(body))) }
             }
-            SKILL -> {
+            STATUS_LEVEL -> {
                 val skills = body["skills"].asJsonObject
+                try { playerData.skillSet.defence = skills[SkillType.DEFENCE.toString()].asInt } catch (e: Exception) { /**パス**/ }
+                try { playerData.skillSet.stamina = skills[SkillType.STAMINA.toString()].asInt } catch (e: Exception) { /**パス**/ }
+                try { playerData.skillSet.strength = skills[SkillType.STRENGTH.toString()].asInt } catch (e: Exception) { /**パス**/ }
+                try { playerData.skillSet.intelligence = skills[SkillType.INTELLIGENCE.toString()].asInt } catch (e: Exception) { /**パス**/ }
+                try { playerData.skillSet.vomiting = skills[SkillType.VOMITING.toString()].asInt } catch (e: Exception) { /**パス**/ }
+                body.add("result", JsonPrimitive(gson.toJson(playerData.skillSet)))
+                sessions.forEach { it.sendMessage(TextMessage(gson.toJson(body))) }
             }
             CUSTOM_DATA -> {
-
+                val key = body["key"].asString
+                val value = body["value"].asString
+                playerData.customData[key] = value
+                body.add("result", JsonPrimitive("{\"key\": \"${key}\", \"valye\": \"${value}\"}"))
+                sessions.forEach { it.sendMessage(TextMessage(gson.toJson(body))) }
             }
             STAMINA -> {
                 val setType = SetType.getById(body["set_type"].asByte)

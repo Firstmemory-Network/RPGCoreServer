@@ -23,7 +23,7 @@ enum class DataType(val id: Byte) {
     MAX_STAMINA(3),
     MAX_HEALTH(4),
     STATUS_POINT(5),
-    SKILL(6),
+    STATUS_LEVEL(6),
     CUSTOM_DATA(7),
     STAMINA(8),
     HEALTH(9);

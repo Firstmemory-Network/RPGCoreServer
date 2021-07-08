@@ -15,8 +15,8 @@ class RpgCoreServerApplication
 
 fun main(args: Array<String>) {
 	try {
-		//FIXME 本番は環境変数に記述+実機にCoreServerを配置する。本番環境での変更点: host: moru3.dev->127.0.0.1
-		SQLow.connect(DatabaseType.MYSQL, "moru3.dev", 3537, "rpgcoreapi", "Fs&l7TVYGuWWtDI=1q:-ZH=qiW!V[0g\$8,1ejrfM7mx<eG2e+b", "RPGCoreAPI", mutableMapOf<String, String>())
+		//FIXME 本番は環境変数に記述+実機にCoreServerを配置する。本番環境での変更点: host: 127.0.0.1->moru3.dev-
+		SQLow.connect(DatabaseType.MYSQL, "127.0.0.1", 3537, "rpgcoreapi", "Fs&l7TVYGuWWtDI=1q:-ZH=qiW!V[0g\$8,1ejrfM7mx<eG2e+b", "RPGCoreAPI", mutableMapOf<String, String>())
 	} catch (e: Exception) {
 		e.printStackTrace()
 		throw Exception()

@@ -1,6 +1,9 @@
 package dev.moru3.RPGCoreServer.websocket.data
 
+import dev.moru3.RPGCoreServer.managers.SessionManager
+import dev.moru3.RPGCoreServer.websocket.model.SetType
 import me.moru3.sqlow.*
+import org.springframework.web.socket.TextMessage
 import java.util.*
 import kotlin.concurrent.thread
 import kotlin.math.pow
@@ -99,6 +102,8 @@ class PlayerData(val uuid: UUID): IPlayerData {
         thread {
             repeat((1..level-oldLevel).count()) {
                 level+=1
+                val json = "{\"request_type\": ${RequestType.SET_PLAYER_DATA.id}, \"player_unique_id\": \"${uuid}\", \"data_type\": ${DataType.LEVEL.id}, \"set_type\": ${SetType.ADD.id}, \"value\": 1, \"result\": ${level}, \"response_type\": \"update_player_data\"}"
+                SessionManager.sessions.forEach { it.sendMessage(TextMessage(json)) }
                 Thread.sleep(500)
             }
         }
