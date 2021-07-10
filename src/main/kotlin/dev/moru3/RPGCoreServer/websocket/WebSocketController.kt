@@ -9,11 +9,10 @@ import dev.moru3.RPGCoreServer.managers.SessionManager
 import dev.moru3.RPGCoreServer.managers.SessionManager.Companion.blockAddress
 import dev.moru3.RPGCoreServer.managers.SessionManager.Companion.sessions
 import dev.moru3.RPGCoreServer.managers.SessionManager.Companion.strikeAddress
-import dev.moru3.RPGCoreServer.websocket.data.DataType
+import dev.moru3.RPGCoreServer.websocket.data.*
 import dev.moru3.RPGCoreServer.websocket.data.DataType.*
-import dev.moru3.RPGCoreServer.websocket.data.RequestType
+import dev.moru3.RPGCoreServer.websocket.data.NotifyType.*
 import dev.moru3.RPGCoreServer.websocket.data.RequestType.*
-import dev.moru3.RPGCoreServer.websocket.data.SkillType
 import dev.moru3.RPGCoreServer.websocket.model.SetType
 import org.springframework.stereotype.Component
 import org.springframework.web.socket.*
@@ -68,11 +67,24 @@ class WebSocketController: TextWebSocketHandler() {
             } else {
                 when (RequestType.getById(body["request_type"].asByte)) {
                     SET_PLAYER_DATA -> { requestSetPlayerData(session, body) }
+                    SERVER_NOTIFY -> { serverNotify(session, body) }
                 }
             }
         } catch (e: Exception) {
             session.sendMessage(TextMessage("{\"response_type\": 3,\"message\": \"${e.message}\"}"))
             return
+        }
+    }
+
+    fun serverNotify(session: WebSocketSession, body: JsonObject) {
+        val playerData: IPlayerData = getPlayerData(body["player_unique_id"].asString)
+        when(NotifyType.getById(body["type"].asByte)) {
+            PLAYER_JOIN -> {
+                playerData.isOnline = true
+            }
+            PLAYER_QUIT -> {
+                playerData.isOnline = false
+            }
         }
     }
 

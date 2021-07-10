@@ -1,7 +1,8 @@
 package dev.moru3.RPGCoreServer.websocket.data
 
 enum class RequestType(val id: Byte) {
-    SET_PLAYER_DATA(0);
+    SET_PLAYER_DATA(0),
+    SERVER_NOTIFY(1);
 
     companion object {
         val types = mutableMapOf<Byte, RequestType>()

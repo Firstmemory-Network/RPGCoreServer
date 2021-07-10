@@ -1,6 +1,9 @@
 package dev.moru3.RPGCoreServer.websocket.data
 
 interface IPlayerData {
+
+    var isOnline: Boolean
+
     /**
      * かね
      */

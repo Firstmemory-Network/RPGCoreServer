@@ -10,7 +10,11 @@ import kotlin.math.pow
 
 class PlayerData(val uuid: UUID): IPlayerData {
 
-    var isOnline = false
+    override var isOnline = false
+        set(value) {
+            if(value) { syncLastLevel() }
+            field = value
+        }
 
     override var balance: Long = 0
         set(value) {
@@ -28,6 +32,7 @@ class PlayerData(val uuid: UUID): IPlayerData {
     override var level: Int = 0
         set(value) {
             if(value<=field) { return }
+            if(isOnline) { lastLevel = value }
             Update("userdata", Where().addKey("uuid").equals().addValue(uuid)).addValue("level", value).send()
             field = value
         }
@@ -69,7 +74,7 @@ class PlayerData(val uuid: UUID): IPlayerData {
             field = value
         }
 
-    var oldLevel: Int = 0
+    var lastLevel: Int = 0
         set(value) {
             Update("userdata", Where().addKey("uuid").equals().addValue(uuid))
                 .addValue("last_level", level).send()
@@ -96,11 +101,11 @@ class PlayerData(val uuid: UUID): IPlayerData {
             .send(false)
     }
 
-    private fun syncOldLevel() {
+    private fun syncLastLevel() {
         if(!isOnline) { return }
-        if(oldLevel==level) { return }
+        if(lastLevel==level) { return }
         thread {
-            repeat((1..level-oldLevel).count()) {
+            repeat((1..level-lastLevel).count()) {
                 level+=1
                 val json = "{\"request_type\": ${RequestType.SET_PLAYER_DATA.id}, \"player_unique_id\": \"${uuid}\", \"data_type\": ${DataType.LEVEL.id}, \"set_type\": ${SetType.ADD.id}, \"value\": 1, \"result\": ${level}, \"response_type\": \"update_player_data\"}"
                 SessionManager.sessions.forEach { it.sendMessage(TextMessage(json)) }
@@ -119,14 +124,14 @@ class PlayerData(val uuid: UUID): IPlayerData {
         maxHealth = result.getInt("max_health")
         maxStamina = result.getInt("max_stamina")
         statusPoint = result.getInt("status_point")
-        oldLevel = result.getInt("last_level")
+        lastLevel = result.getInt("last_level")
     }
 
     init {
         reload()
         health = maxHealth.toDouble()
         stamina = maxStamina
-        if(isOnline) { syncOldLevel() }
+        if(isOnline) { syncLastLevel() }
     }
 
     companion object {
